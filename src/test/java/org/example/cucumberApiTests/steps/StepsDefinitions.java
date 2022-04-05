@@ -22,7 +22,6 @@ public class StepsDefinitions {
     private static String userId;
 
 
-
     @Given("Set up rest client")
     public void setUpRestClient() {
         request = RestAssured.given()
@@ -75,19 +74,28 @@ public class StepsDefinitions {
                 .put("/users/" + userId);
     }
 
+    @When("Try to put png media type")
+    public void tryToPutPngMediaType() {
+        File file = new File("src/main/java/data/test.png");
+        response = request
+                .contentType("png")
+                .body(file)
+                .when()
+                .put("/users/" + userId);
+    }
+
+    @When("Delete user data")
+    public void deleteUserData() {
+        response = request
+                .when()
+                .delete("/users/" + userId);
+    }
+
     @When("Try to change User data without authorization")
     public void tryToChangeUserDataWithoutAuthorization() {
         response = request
                 .when()
                 .post("/users");
-    }
-
-    @When("Delete user data")
-    public void deleteUserData() {
-        response = request.auth()
-                .oauth2(token)
-                .when()
-                .delete("/users/" + userId);
     }
 
     @When("Get non-existent user")
@@ -107,6 +115,12 @@ public class StepsDefinitions {
     @Then("Validate Status Code is: {int}")
     public void then(int expectedStatus) {
         Assert.assertEquals("Status code:" + response.getStatusCode(), expectedStatus, response.getStatusCode());
+    }
+
+
+    @When("Try to authorize to inaccessible endpoint")
+    public void tryToAuthorizeToInaccessibleEndpoint() {
+        //TODO нет доступа к эндпоинту
     }
 
 }

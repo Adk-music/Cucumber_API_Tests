@@ -34,10 +34,28 @@ Feature: Positive and Negative User Tests
     When Try to change User data without authorization
     Then Validate Status Code is: 401
 
+  Scenario:
+    Given Set up rest client
+    And Authorization
+    When Try to authorize to inaccessible endpoint
+    Then Validate Status Code is: 403
+
   Scenario: Get list of users "Not Found"
     Given Set up rest client
     When Get non-existent user
     Then Validate Status Code is: 404
+
+  Scenario: Make an unallowed request
+    Given Set up rest client
+    And Authorization
+    When Make an unallowed request
+    Then Validate Status Code is: 405
+
+  Scenario: Put PMG media file to User data
+    Given Set up rest client
+    And Authorization
+    When Try to put png media type
+    Then Validate Status Code is: 406
 
   Scenario: Create User with unprocessable Entity data
     Given Set up rest client
