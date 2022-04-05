@@ -1,6 +1,7 @@
 package org.example.cucumberApiTests.steps;
 
 import data.User;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -8,6 +9,8 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
+
+import java.io.File;
 
 
 public class StepsDefinitions {
@@ -19,10 +22,17 @@ public class StepsDefinitions {
     private static String userId;
 
 
+
     @Given("Set up rest client")
     public void setUpRestClient() {
         request = RestAssured.given()
                 .baseUri(BASE_URL);
+    }
+
+    @And("Authorization")
+    public void authorization() {
+        request = request.auth()
+                .oauth2(token);
     }
 
     @When("Get list of users")
@@ -34,8 +44,7 @@ public class StepsDefinitions {
     @When("Add new user parameters")
     public void addNewUserParameters() {
         User user = new User("Jakob Kuki", "male", "jkuk1112222@abc.com", "active");
-        response = request.auth()
-                .oauth2(token)
+        response = request
                 .contentType("application/json")
                 .body(user)
                 .when()
@@ -49,8 +58,7 @@ public class StepsDefinitions {
     @When("Update User parameters")
     public void updateUserParameters() {
         User user = new User(userId, "Jakob Kuki", "male", "jkukikuk@abc.com", "active");
-        response = request.auth()
-                .oauth2(token)
+        response = request
                 .contentType("application/json")
                 .body(user)
                 .when()
@@ -60,8 +68,7 @@ public class StepsDefinitions {
 
     @When("Put invalid User data")
     public void putInvalidUserData() {
-        response = request.auth()
-                .oauth2(token)
+        response = request
                 .contentType("application/json")
                 .body("email: 123kukud@abc.com")
                 .when()
@@ -90,8 +97,7 @@ public class StepsDefinitions {
 
     @When("Create Unprocessable data")
     public void createUnprocessableData() {
-        response = request.auth()
-                .oauth2(token)
+        response = request
                 .contentType("application/json")
                 .body("{\"name\": \"Jakob Kuki\"}")
                 .when()
