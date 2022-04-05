@@ -67,6 +67,21 @@ public class StepsDefinitions {
 
     }
 
+    @When("Put invalid User data")
+    public void putInvalidUserData() {
+        response = request.auth()
+                .oauth2(token)
+                .contentType("application/json")
+                .body("email: 123kukud@abc.com")
+                .when()
+                .put("/users/5149");
+    }
+
+    @When("Get non-existent user")
+    public void getNonExistentUser() {
+        response = request.when().get("/users/12345");
+    }
+
     @Then("Validate Status Code is: {int}")
     public void then(int expectedStatus) {
         Assert.assertEquals("Status code:" + response.getStatusCode(), expectedStatus, response.getStatusCode());

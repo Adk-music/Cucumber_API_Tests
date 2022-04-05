@@ -1,4 +1,4 @@
-Feature: Positive Tests
+Feature: Positive and Negative User Tests
 
   Scenario: Get list of users
     Given Set up rest client
@@ -20,3 +20,12 @@ Feature: Positive Tests
     When Delete user data
     Then Validate Status Code is: 204
 
+  Scenario: Invalid User data in the request
+    Given Set up rest client
+    When Put invalid User data
+    Then Validate Status Code is: 400
+
+  Scenario: Get list of users "Not Found"
+    Given Set up rest client
+    When Get non-existent user
+    Then Validate Status Code is: 404
