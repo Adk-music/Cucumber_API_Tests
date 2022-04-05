@@ -25,6 +25,11 @@ Feature: Positive and Negative User Tests
     When Put invalid User data
     Then Validate Status Code is: 400
 
+  Scenario: Unauthorized User
+    Given Set up rest client
+    When Try to change User data without authorization
+    Then Validate Status Code is: 401
+
   Scenario: Get list of users "Not Found"
     Given Set up rest client
     When Get non-existent user

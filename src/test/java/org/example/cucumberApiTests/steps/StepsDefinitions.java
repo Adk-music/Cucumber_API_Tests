@@ -58,15 +58,6 @@ public class StepsDefinitions {
         System.out.println(response.body().prettyPrint());
     }
 
-    @When("Delete user data")
-    public void deleteUserData() {
-        response = request.auth()
-                .oauth2(token)
-                .when()
-                .delete("/users/" + userId);
-
-    }
-
     @When("Put invalid User data")
     public void putInvalidUserData() {
         response = request.auth()
@@ -74,7 +65,23 @@ public class StepsDefinitions {
                 .contentType("application/json")
                 .body("email: 123kukud@abc.com")
                 .when()
-                .put("/users/5149");
+                .put("/users/" + userId);
+    }
+
+    @When("Try to change User data without authorization")
+    public void tryToChangeUserDataWithoutAuthorization() {
+        response = request
+                .when()
+                .post("/users");
+    }
+
+    @When("Delete user data")
+    public void deleteUserData() {
+        response = request.auth()
+                .oauth2(token)
+                .when()
+                .delete("/users/" + userId);
+
     }
 
     @When("Get non-existent user")
