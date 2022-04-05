@@ -34,3 +34,8 @@ Feature: Positive and Negative User Tests
     Given Set up rest client
     When Get non-existent user
     Then Validate Status Code is: 404
+
+  Scenario: Create User with unprocessable Entity data
+    Given Set up rest client
+    When Create Unprocessable data
+    Then Validate Status Code is: 422

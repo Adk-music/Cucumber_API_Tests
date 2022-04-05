@@ -81,12 +81,21 @@ public class StepsDefinitions {
                 .oauth2(token)
                 .when()
                 .delete("/users/" + userId);
-
     }
 
     @When("Get non-existent user")
     public void getNonExistentUser() {
         response = request.when().get("/users/12345");
+    }
+
+    @When("Create Unprocessable data")
+    public void createUnprocessableData() {
+        response = request.auth()
+                .oauth2(token)
+                .contentType("application/json")
+                .body("{\"name\": \"Jakob Kuki\"}")
+                .when()
+                .post("/users/");
     }
 
     @Then("Validate Status Code is: {int}")
