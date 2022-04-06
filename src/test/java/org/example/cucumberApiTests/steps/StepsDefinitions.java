@@ -4,6 +4,10 @@ import data.ApiResponseWithError;
 import data.ApiResponseWithUser;
 import data.Error;
 import data.User;
+import io.cucumber.java.After;
+import io.cucumber.java.AfterAll;
+import io.cucumber.java.BeforeAll;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -12,8 +16,10 @@ import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
+import util.DatabaseManager;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -27,6 +33,22 @@ public class StepsDefinitions {
     private static Response response;
     private static RequestSpecification request;
     private static String userId;
+    private static DatabaseManager databaseManager;
+
+    @BeforeAll
+    public static void before_all() throws SQLException {
+        databaseManager = new DatabaseManager();
+    }
+
+    @AfterAll
+    public static void after_all() throws SQLException {
+        databaseManager.close();
+    }
+
+    @After
+    public void after(Scenario scenario) throws SQLException {
+        databaseManager.recordTestResult(scenario.getName(), scenario.getStatus().name());
+    }
 
 
     @Given("Set up rest client")
@@ -42,9 +64,8 @@ public class StepsDefinitions {
     }
 
     @When("Get list of users")
-    public void when() {
+    public void getListOfUsers() {
         response = request.when().get("/users");
-
     }
 
     @When("Add new user parameters")
@@ -58,8 +79,6 @@ public class StepsDefinitions {
         List<User> users = response.as(ApiResponseWithUser.class).getData();
         User responseUser = users.get(0);
         userId = responseUser.getId();
-        System.out.println(userId);
-        System.out.println(response.body().prettyPrint());
     }
 
     @When("Update User parameters")
@@ -83,7 +102,7 @@ public class StepsDefinitions {
 
     @When("Try to put png media type")
     public void tryToPutPngMediaType() {
-        File file = new File("src/main/java/data/test.png");
+        File file = new File("src/main/resources/test.png");
         response = request
                 .contentType("png")
                 .body(file)
@@ -95,7 +114,7 @@ public class StepsDefinitions {
     public void tryToPostLargeMediaData() {
         response = request
                 .contentType("image/jpeg")
-                .body(new File("src/main/java/data/test.png"))
+                .body(new File("src/main/resources/test.png"))
                 .when()
                 .post("/users/");
     }
@@ -104,7 +123,7 @@ public class StepsDefinitions {
     public void tryToPostJpegFile() {
         response = request
                 .contentType("image/jpeg")
-                .body(new File("src/main/java/data/test2.jpeg"))
+                .body(new File("src/main/resources/test2.jpeg"))
                 .when()
                 .post("/users/");
     }
@@ -117,7 +136,6 @@ public class StepsDefinitions {
                     .oauth2(limitedToken)
                     .when()
                     .get("/users");
-            System.out.println(response.getStatusCode());
         }
     }
 
@@ -160,7 +178,7 @@ public class StepsDefinitions {
     }
 
     @Then("Validate Status Code is: {int}")
-    public void then(int expectedStatus) {
+    public void thenValidateStatusCode(int expectedStatus) {
         ApiResponseWithUser apiResponseWithUSer = response.as(ApiResponseWithUser.class);
         int code = apiResponseWithUSer.getCode();
         Assert.assertEquals("Status code:" + code, expectedStatus, code);
