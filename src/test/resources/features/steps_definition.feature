@@ -61,3 +61,9 @@ Feature: Positive and Negative User Tests
     And Authorization
     When Create Unprocessable data
     Then Validate Errors for missing post fields
+
+  Scenario: Create new User with incorrect Data
+    Given Set up rest client
+    And Authorization
+    When Add incorrect user parameters
+    Then Validate Errors for missing incorrect fields values

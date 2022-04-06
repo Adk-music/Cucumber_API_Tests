@@ -14,6 +14,7 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -148,6 +149,16 @@ public class StepsDefinitions {
                 .post("/users/");
     }
 
+    @When("Add incorrect user parameters")
+    public void addIncorrectUserParameters() {
+        User user = new User("Jakob Kuki", "m", "jkuk11199.abc.com", "errhgfth");
+        response = request
+                .contentType("application/json")
+                .body(user)
+                .when()
+                .post("/users");
+    }
+
     @Then("Validate Status Code is: {int}")
     public void then(int expectedStatus) {
         ApiResponseWithUser apiResponseWithUSer = response.as(ApiResponseWithUser.class);
@@ -181,10 +192,23 @@ public class StepsDefinitions {
             Assert.assertTrue(missingFields.contains(error.getField()));
             Assert.assertEquals("can't be blank", error.getMessage());
         });
-
-
     }
 
+    @Then("Validate Errors for missing incorrect fields values")
+    public void thenErrorForIncorrectFieldsValues() {
+        ApiResponseWithError apiResponseWithError = response.as(ApiResponseWithError.class);
+        int code = apiResponseWithError.getCode();
+        List<Error> errors = apiResponseWithError.getErrors();
+        Assert.assertEquals("Status code:" + code, 422, code);
+        Set<String> missingFields = Set.of("gender", "status", "email");
+        errors.forEach(error -> {
+            Assert.assertTrue(missingFields.contains(error.getField()));
+        });
+        List<String> errorMessages = Arrays.asList("can't be blank", "can't be blank", "is invalid");
+        errors.forEach(errorMessage -> {
+            Assert.assertTrue(errorMessages.contains(errorMessage.getMessage()));
+        });
+    }
 
 }
 
