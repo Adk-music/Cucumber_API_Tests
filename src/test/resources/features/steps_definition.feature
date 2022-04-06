@@ -45,17 +45,28 @@ Feature: Positive and Negative User Tests
     When Get non-existent user
     Then Validate Status Code is: 404
 
-  Scenario: Make an unallowed request
-    Given Set up rest client
-    And Authorization
-    When Make an unallowed request
-    Then Validate Status Code is: 405
-
-  Scenario: Put PMG media file to User data
+  Scenario: Put PNG media file to User data
     Given Set up rest client
     And Authorization
     When Try to put png media type
     Then Validate Status Code is: 406
+
+  Scenario: Validate status Too Many Request
+    Given Set up rest client
+    When Try to put multiple requests
+    Then Validate Status Code is: 429
+
+  Scenario: Delete User
+    Given Set up rest client
+    And Authorization
+    When Delete user data
+    Then Validate Status Code is: 204
+
+  Scenario: Put unsupported media type to User data
+    Given Set up rest client
+    And Authorization
+    When Try to put unsupported media type
+    Then Validate Status Code is: 415
 
   Scenario: Create User with unprocessable Entity data
     Given Set up rest client

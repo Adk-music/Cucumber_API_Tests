@@ -6,6 +6,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import org.junit.Assert;
@@ -17,6 +18,7 @@ public class StepsDefinitions {
 
     private static final String BASE_URL = "https://gorest.co.in/public/v2";
     private static final String token = "3d109bb10acfb41f044fe9873794d854294671c0f46210bf82195d6a119af4d0";
+    private static final String limitedToken = "37047c463c2e2978de9567754ba2ae8eee2970901ef80eb8b25228bb4322fc18";
     private static Response response;
     private static RequestSpecification request;
     private static String userId;
@@ -62,7 +64,6 @@ public class StepsDefinitions {
                 .body(user)
                 .when()
                 .put("/users/" + userId);
-        System.out.println(response.body().prettyPrint());
     }
 
     @When("Put invalid User data")
@@ -82,6 +83,28 @@ public class StepsDefinitions {
                 .body(file)
                 .when()
                 .put("/users/" + userId);
+    }
+
+    @When("Try to put unsupported media type")
+    public void tryToPutUnsupportedMediaType() {
+        response = request
+                .contentType(ContentType.TEXT)
+                .body(new byte[]{2, 34, 52, 3})
+                .when()
+                .post("/users/");
+        //response cod should be 415 but 404
+    }
+
+    @When("Try to put multiple requests")
+    public void tryToPutMultipleRequests() {
+        int count = 3;
+        for (int i = 0; i < count; i++) {
+            response = request.auth()
+                    .oauth2(limitedToken)
+                    .when()
+                    .get("/users");
+            System.out.println(response.getStatusCode());
+        }
     }
 
     @When("Delete user data")
